@@ -30,6 +30,38 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "a compatible and reliable market data source."
     )
 
+async def testdata(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    import urllib.request
+    import urllib.error
+
+    api_key = os.getenv("OTCHARTS_API_KEY")
+
+    if not api_key:
+        await update.message.reply_text("OTCharts API key is missing.")
+        return
+
+    url = "https://otcharts.com/v1/candles?venue=otc&symbol=EURUSD_otc&timeframe=1m&limit=5"
+
+    request = urllib.request.Request(
+        url,
+        headers={"Authorization": f"Bearer {api_key}"}
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            result = response.read().decode("utf-8")
+            await update.message.reply_text(
+                "OTCharts response:\n" + result[:2500]
+            )
+    except urllib.error.HTTPError as error:
+        await update.message.reply_text(
+            f"OTCharts HTTP error: {error.code}"
+        )
+    except Exception as error:
+        await update.message.reply_text(
+            f"Connection error: {type(error).__name__}"
+        )
+
 def main():
     token = os.getenv("TELEGRAM_BOT_TOKEN")
 
@@ -40,6 +72,7 @@ def main():
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("status", status))
+    app.add_handler(CommandHandler("testdata", testdata))
 
     print("Blitz OTC Telegram bot is starting...")
     app.run_polling()
