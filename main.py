@@ -57,9 +57,10 @@ async def testdata(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "OTCharts response:\n" + result[:2500]
             )
     except urllib.error.HTTPError as error:
-        await update.message.reply_text(
-            f"OTCharts HTTP error: {error.code}"
-        )
+    details = error.read().decode("utf-8", errors="replace")
+    await update.message.reply_text(
+        f"OTCharts HTTP error: {error.code}\n{details[:1500]}"
+       )
     except Exception as error:
         await update.message.reply_text(
             f"Connection error: {type(error).__name__}"
