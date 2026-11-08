@@ -40,11 +40,14 @@ async def testdata(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("OTCharts API key is missing.")
         return
 
-    url = "https://otcharts.com/v1/candles?venue=otc&symbol=EURUSD_otc&timeframe=1m&limit=5"
+    url = url = "https://otcharts.com/v1/candles?venue=iq&symbol=EURUSD-OTC&tf=60&limit=5"
 
     request = urllib.request.Request(
         url,
-        headers={"Authorization": f"Bearer {api_key}"}
+    headers={
+    "Authorization": f"Bearer {api_key}",
+    "User-Agent": "BlitzOTCBot/1.0"
+}
     )
 
     try:
